@@ -91,7 +91,10 @@ export function PaperParallax({
   const baked = textures != null;
 
   return (
-    <div ref={ref} className={`pp-scene ${className ?? ""}`}>
+    <div
+      ref={ref}
+      className={`pp-scene isolate size-full overflow-hidden ${className ?? ""}`}
+    >
       {layers.map((layer, i) => {
         const sway = layer.sway ?? 1;
         const d = layer.depth;
@@ -115,13 +118,18 @@ export function PaperParallax({
         return (
           <div
             key={i}
-            className={`pp-layer ${layer.className ?? ""}`}
+            className={`pp-layer absolute -inset-[9%] h-[118%] w-[118%] will-change-transform [&_svg]:block ${layer.className ?? ""}`}
             style={style}
             data-depth={d}
             aria-hidden="true"
           >
             {baked ? (
-              <img src={textures![i]} alt="" draggable={false} />
+              <img
+                className="block size-full object-cover object-center"
+                src={textures![i]}
+                alt=""
+                draggable={false}
+              />
             ) : (
               layer.content
             )}

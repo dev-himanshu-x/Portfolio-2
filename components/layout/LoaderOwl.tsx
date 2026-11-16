@@ -10,7 +10,7 @@ const BELLY = [4, 15, 26, 37];
 /** The scene's owl, perched on a branch, with enough detail to hold up large. */
 export function LoaderOwl() {
   return (
-    <div className="loader__owl">
+    <div className="relative w-[min(18rem,64vw)] [&_svg]:block [&_svg]:h-auto [&_svg]:w-full">
       <svg viewBox={VIEW} aria-hidden="true">
         <path
           d="M-78 58 C-48 49 42 48 80 60"

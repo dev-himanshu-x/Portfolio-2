@@ -5,6 +5,7 @@ import { bakedCount, onBake } from "@/components/parallax/bakeStatus";
 import { Cloud, Layer } from "@/scenes/primitives/shapes";
 import { LoaderOwl } from "./LoaderOwl";
 
+const SKY = "pointer-events-none absolute -inset-[5%] will-change-transform";
 const SCENES = 2;
 const STEPS = SCENES + 2;
 const MIN_MS = 1200;
@@ -63,7 +64,7 @@ export function Loader() {
       requestAnimationFrame(() =>
         requestAnimationFrame(() => {
           root.classList.remove("loading");
-          el.classList.add("loader--done");
+          el.dataset.done = "";
           window.dispatchEvent(new Event("site-ready"));
           hideTimer = window.setTimeout(() => {
             el.style.display = "none";
@@ -125,22 +126,36 @@ export function Loader() {
   }, []);
 
   return (
-    <div className="loader" ref={ref} role="status" aria-label="Loading">
-      <div className="loader__sky loader__sky--far" aria-hidden="true">
+    <div
+      className="fixed inset-0 z-[1000] grid animate-[loader-failsafe_0s_linear_12s_forwards] place-items-center overflow-hidden bg-[radial-gradient(ellipse_at_50%_38%,#fbefe2_0%,#f3ece1_55%,#e7e0d4_100%)] text-ink transition-opacity duration-[600ms] ease-[ease] data-done:pointer-events-none data-done:opacity-0"
+      ref={ref}
+      role="status"
+      aria-label="Loading"
+    >
+      <div
+        className={`${SKY} animate-[loader-drift_20s_ease-in-out_infinite_alternate] opacity-75`}
+        aria-hidden="true"
+      >
         <Layer>
           <Cloud x={150} y={220} scale={0.9} />
           <Cloud x={930} y={150} scale={1.1} />
           <Cloud x={1380} y={340} scale={0.8} />
         </Layer>
       </div>
-      <div className="loader__sky loader__sky--mid" aria-hidden="true">
+      <div
+        className={`${SKY} animate-[loader-drift_14s_ease-in-out_infinite_alternate]`}
+        aria-hidden="true"
+      >
         <Layer>
           <Cloud x={460} y={500} scale={1.2} />
           <Cloud x={1180} y={620} scale={1} />
           <Cloud x={-60} y={690} scale={1} />
         </Layer>
       </div>
-      <div className="loader__sky loader__sky--near" aria-hidden="true">
+      <div
+        className={`${SKY} animate-[loader-drift_10s_ease-in-out_infinite_alternate-reverse]`}
+        aria-hidden="true"
+      >
         <Layer>
           <Cloud x={720} y={850} scale={1.5} />
           <Cloud x={80} y={900} scale={1.3} />
@@ -148,16 +163,16 @@ export function Loader() {
         </Layer>
       </div>
 
-      <div className="loader__content">
+      <div className="relative z-[1] flex flex-col items-center gap-[1.8rem] px-[1.4rem]">
         <LoaderOwl />
 
-        <div className="loader__hud">
-          <p className="loader__meta">
+        <div className="w-[min(22rem,76vw)] font-mono text-[0.72rem] tracking-[0.3em]">
+          <p className="mt-0 mb-[0.6rem] flex justify-between [&>span:last-child]:text-ember [&>span:last-child]:tabular-nums">
             <span>LOADING</span>
             <span ref={pctRef}>0%</span>
           </p>
-          <div className="loader__bar">
-            <i />
+          <div className="h-[6px] bg-[rgba(26,26,26,0.14)]">
+            <i className="block h-full origin-left bg-[linear-gradient(90deg,var(--color-ember),var(--color-lava),#fbb13c)] [transform:scaleX(var(--p,0))]" />
           </div>
         </div>
       </div>

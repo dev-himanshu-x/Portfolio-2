@@ -522,18 +522,18 @@ export function OwlEyes({
 }) {
   return (
     <svg
-      className="pp-overlay"
+      className="pp-overlay pointer-events-none absolute inset-0"
       viewBox={viewBox}
       preserveAspectRatio={fit}
       width="100%"
       height="100%"
     >
       <g
-        className="owl-eyes"
+        className="group/eyes"
         transform={`translate(${x} ${y}) scale(${scale})`}
       >
         <rect
-          className="owl-eyes__hit"
+          className="cursor-pointer [pointer-events:all]"
           x="-28"
           y="-42"
           width="56"
@@ -541,7 +541,10 @@ export function OwlEyes({
           fill="transparent"
         />
         {[-9, 9].map((cx) => (
-          <g className="owl-eye" key={cx}>
+          <g
+            className="origin-center [transform-box:fill-box] motion-safe:animate-[owl-blink_2s_ease-in-out_infinite] motion-safe:group-hover/eyes:animate-[owl-blink-fast_0.5s_ease-in-out_2]"
+            key={cx}
+          >
             <circle cx={cx} cy="-18" r="5" fill={eye} />
             <circle cx={cx} cy="-18" r="2" fill={fill} />
           </g>

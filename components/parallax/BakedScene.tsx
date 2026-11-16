@@ -63,16 +63,24 @@ export function BakedScene({
   const baked = textures != null;
 
   return (
-    <div ref={ref} className={`pp-scene ${className ?? ""}`}>
+    <div
+      ref={ref}
+      className={`pp-scene isolate size-full overflow-hidden ${className ?? ""}`}
+    >
       {layers.map((layer, i) => (
         <div
           key={i}
-          className={`pp-layer ${layerClassName ?? ""} ${layer.className ?? ""}`}
+          className={`pp-layer absolute -inset-[9%] h-[118%] w-[118%] will-change-transform [&_svg]:block ${layerClassName ?? ""} ${layer.className ?? ""}`}
           data-depth={layer.depth}
           aria-hidden="true"
         >
           {baked ? (
-            <img src={textures![i]} alt="" draggable={false} />
+            <img
+              className="block size-full object-cover object-center"
+              src={textures![i]}
+              alt=""
+              draggable={false}
+            />
           ) : (
             layer.content
           )}

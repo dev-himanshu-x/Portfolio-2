@@ -6,13 +6,13 @@ export interface Role {
 
 export const EXPERIENCE: Role[] = [
   {
-    company: "ERP EduVverse",
+    company: "EduVverse",
     role: "Frontend Developer",
-    period: "June 2026 – Present",
+    period: "January 2026 – Present",
   },
   {
     company: "Team ERP",
     role: "Full Stack Developer Intern",
-    period: "Jan. 2026 – May 2026",
+    period: "September 2025 – December 2025",
   },
 ];

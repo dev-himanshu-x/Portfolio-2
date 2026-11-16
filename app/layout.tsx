@@ -14,25 +14,25 @@ import { SITE } from "@/content/site";
 const display = Bricolage_Grotesque({
   subsets: ["latin"],
   weight: ["700", "800"],
-  variable: "--font-display",
+  variable: "--nf-display",
 });
 
 const outline = Anton({
   subsets: ["latin"],
   weight: "400",
-  variable: "--font-outline",
+  variable: "--nf-outline",
 });
 
 const body = DM_Sans({
   subsets: ["latin"],
   weight: "400",
-  variable: "--font-body",
+  variable: "--nf-body",
 });
 
 const mono = Space_Mono({
   subsets: ["latin"],
   weight: "400",
-  variable: "--font-mono",
+  variable: "--nf-mono",
 });
 
 export const metadata: Metadata = {

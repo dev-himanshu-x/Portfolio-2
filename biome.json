@@ -28,6 +28,6 @@
       "performance": { "noImgElement": "off" }
     }
   },
-  "css": { "parser": { "cssModules": false } },
+  "css": { "parser": { "cssModules": false, "tailwindDirectives": true } },
   "assist": { "actions": { "source": { "organizeImports": "on" } } }
 }

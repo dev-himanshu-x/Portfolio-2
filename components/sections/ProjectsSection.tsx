@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
+import { EYEBROW } from "@/components/ui";
 import type { Project } from "@/content/projects";
 import { BigLeaf, FanLeaf } from "@/scenes/primitives/jungleShapes";
 import { Palm } from "@/scenes/primitives/shapes";
@@ -14,6 +15,11 @@ import { LeafBreeze } from "./LeafBreeze";
  * to ticker stalls and respects prefers-reduced-motion for free.
  */
 const PAGE = 8;
+
+const REVEAL =
+  "motion-safe:opacity-0 motion-safe:group-data-[in]/work:animate-[work-rise_0.7s_cubic-bezier(0.22,1,0.36,1)_calc(var(--i,0)*0.09s)_backwards] motion-safe:group-data-[in]/work:opacity-100";
+const CARD_LINK =
+  "inline-flex items-center gap-[0.4rem] text-[0.86rem] text-paper no-underline transition-colors duration-[250ms] ease-[ease] hover:text-lava [&:last-child:not(:first-child)]:text-[rgba(247,245,240,0.6)] [&>svg]:size-[1.1em]";
 
 function ExternalIcon() {
   return (
@@ -45,7 +51,7 @@ function Flora({ end }: { end?: boolean }) {
   const leaf = "#25602f";
   return (
     <svg
-      className={end ? "work__flora work__flora--end" : "work__flora"}
+      className={`pointer-events-none absolute left-0 h-[min(100%,640px)] w-full opacity-[0.55] ${end ? "bottom-0 -scale-y-100" : "top-0"}`}
       viewBox="0 0 1600 1000"
       preserveAspectRatio="xMidYMid slice"
       aria-hidden="true"
@@ -83,7 +89,7 @@ export function ProjectsSection({ projects }: { projects: Project[] }) {
     if (!el) return;
     const check = () => {
       if (el.getBoundingClientRect().top < window.innerHeight * 0.7) {
-        el.classList.add("in");
+        el.setAttribute("data-in", "");
         window.removeEventListener("scroll", check);
         window.removeEventListener("resize", check);
       }
@@ -98,61 +104,100 @@ export function ProjectsSection({ projects }: { projects: Project[] }) {
   }, []);
 
   return (
-    <section className="work" id="work" ref={ref}>
+    <section
+      className="group/work relative overflow-hidden bg-ink-green px-[clamp(1.4rem,5vw,4rem)] pt-[clamp(4rem,10vh,7rem)] pb-[clamp(5rem,12vh,8rem)] text-paper"
+      id="work"
+      ref={ref}
+    >
       <Flora />
       <Flora end />
       <LeafBreeze />
 
-      <div className="work__inner">
-        <div className="work-head">
-          <p className="hud-eyebrow reveal" style={{ ["--i" as string]: 0 }}>
+      <div className="relative mx-auto max-w-[1280px]">
+        <div>
+          <p
+            className={`${EYEBROW} mb-[0.4rem] text-lava ${REVEAL}`}
+            style={{ ["--i" as string]: 0 }}
+          >
             PLATE 03 — PROJECTS
           </p>
-          <h2 className="work-title reveal" style={{ ["--i" as string]: 1 }}>
-            FEATURED <em>WORKS</em>
+          <h2
+            className={`mt-0 mb-[1.4rem] font-outline text-[clamp(2.6rem,7vw,5.5rem)] leading-[0.95] font-normal ${REVEAL}`}
+            style={{ ["--i" as string]: 1 }}
+          >
+            FEATURED{" "}
+            <em className="text-transparent not-italic [-webkit-text-stroke:2px_var(--color-paper)]">
+              WORKS
+            </em>
           </h2>
-          <p className="work-sub reveal" style={{ ["--i" as string]: 2 }}>
+          <p
+            className={`mt-0 mb-[1.6rem] max-w-[34rem] text-[1.05rem] leading-[1.55] text-[rgba(247,245,240,0.7)] ${REVEAL}`}
+            style={{ ["--i" as string]: 2 }}
+          >
             Live previews and source code for what I have built.
           </p>
         </div>
-        <div className="work-rule" />
+        <div className="mb-[clamp(2rem,5vh,3.5rem)] h-px origin-left bg-[rgba(247,245,240,0.3)] transition-transform delay-150 duration-[900ms] ease-[cubic-bezier(0.65,0,0.35,1)] motion-safe:scale-x-0 motion-safe:group-data-[in]/work:scale-x-100" />
 
-        <div className="work-grid">
+        <div className="grid grid-cols-1 gap-x-[clamp(1.2rem,2.2vw,1.8rem)] gap-y-[clamp(3.4rem,7vw,5rem)] min-[700px]:grid-cols-2 min-[1040px]:grid-cols-3">
           {projects.slice(0, shown).map((p, i) => (
             <article
               key={p.title}
-              className="work-card reveal"
+              className={`group/card flex flex-col text-paper ${REVEAL}`}
               style={{ ["--i" as string]: (i % PAGE) + 2 }}
             >
-              <div className="work-card__shot">
+              <div className="relative aspect-[1.85/1] overflow-hidden rounded-[13px] bg-[rgba(247,245,240,0.06)] shadow-[0_0_0_1px_rgba(247,245,240,0.12)]">
                 {p.image ? (
                   <Image
                     src={p.image}
                     alt={`${p.title} preview`}
+                    className="block size-full object-cover object-top transition-transform duration-[600ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover/card:scale-[1.03]"
                     width={1280}
                     height={800}
                     sizes="(min-width: 1040px) 400px, (min-width: 700px) 50vw, 100vw"
                   />
                 ) : (
-                  <div className="work-card__ph">
-                    <span>{p.title}</span>
-                    <small>SOURCE ONLY</small>
+                  <div className="flex h-full flex-col items-center justify-center gap-[0.7rem] bg-[radial-gradient(circle_at_20%_15%,rgba(242,100,25,0.16),transparent_55%),radial-gradient(rgba(247,245,240,0.12)_1px,transparent_1.4px)_0_0/14px_14px,linear-gradient(135deg,#1f4a2d,#14241b)] p-4 text-center">
+                    <span className="font-outline text-[clamp(1.5rem,2.4vw,2rem)] leading-none tracking-[0.02em] text-[rgba(247,245,240,0.85)] uppercase">
+                      {p.title}
+                    </span>
+                    <small className="font-mono text-[0.62rem] tracking-[0.24em] text-[rgba(247,245,240,0.5)]">
+                      SOURCE ONLY
+                    </small>
                   </div>
                 )}
               </div>
-              <h3 className="work-card__title">{p.title}</h3>
+              <h3 className="mt-[0.9rem] mb-[0.4rem] font-display text-[1.3rem] leading-[1.15] font-bold">
+                {p.title}
+              </h3>
               {p.tech.length > 0 && (
-                <p className="work-card__tech">{p.tech.join(" / ")}</p>
+                <p className="mt-0 mb-[0.6rem] text-[0.78rem] leading-[1.5] text-[rgba(247,245,240,0.55)]">
+                  {p.tech.join(" / ")}
+                </p>
               )}
-              {p.blurb && <p className="work-card__blurb">{p.blurb}</p>}
-              <p className="work-card__links">
+              {p.blurb && (
+                <p className="mt-0 mb-[0.9rem] line-clamp-3 text-[0.84rem] leading-[1.55] text-[rgba(247,245,240,0.8)]">
+                  {p.blurb}
+                </p>
+              )}
+              <p className="mt-auto mb-0 flex flex-wrap gap-x-[1.2rem] gap-y-2 pt-[0.2rem]">
                 {p.live && (
-                  <a href={p.live} target="_blank" rel="noreferrer">
+                  <a
+                    className={CARD_LINK}
+                    href={p.live}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
                     <ExternalIcon /> Live Preview
                   </a>
                 )}
                 {p.source && (
-                  <a href={p.source} target="_blank" rel="noreferrer">
+                  <a
+                    className={CARD_LINK}
+                    href={p.source}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
                     <GithubIcon /> Source
                   </a>
                 )}
@@ -162,13 +207,13 @@ export function ProjectsSection({ projects }: { projects: Project[] }) {
         </div>
 
         {projects.length > PAGE && (
-          <div className="work-more">
-            <p className="work-more__count">
+          <div className="mt-[clamp(2rem,5vh,3.2rem)] flex flex-col items-center gap-[0.9rem]">
+            <p className="m-0 font-mono text-[0.64rem] tracking-[0.2em] text-[rgba(247,245,240,0.65)]">
               {Math.min(shown, projects.length)} / {projects.length}
             </p>
             <button
               type="button"
-              className="work-more__btn"
+              className="cursor-pointer border border-[rgba(247,245,240,0.45)] bg-transparent px-[1.8rem] py-[0.85rem] font-mono text-[0.72rem] tracking-[0.22em] text-paper transition-[background,color,border-color] duration-300 ease-[ease] hover:border-paper hover:bg-paper hover:text-ink-green"
               onClick={() =>
                 setShown((n) =>
                   n < projects.length

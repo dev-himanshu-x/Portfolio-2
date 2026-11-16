@@ -9,7 +9,7 @@ and a meadow footer. Every scene is hand-built SVG.
 - **Next.js 16** (App Router) with **React 19** and **TypeScript**
 - **GSAP + ScrollTrigger** for the pinned scroll animation
 - **Lenis** for smooth, inertial scrolling
-- **Plain CSS** (`app/globals.css`), no UI framework
+- **Tailwind CSS v4** utilities in the components; `app/globals.css` holds the theme tokens, base styles and keyframes
 - **Biome** for linting and formatting, **Bun** for packages and scripts
 
 ## Getting started

@@ -20,6 +20,9 @@ const LEAVES: Array<[number, number, number, number, string, number]> = [
   [92, 18, 26, -11, "#3f9a4a", 30],
 ];
 
+const PLAY =
+  "[animation-play-state:paused] group-data-[live]/breeze:[animation-play-state:running]";
+
 export function LeafBreeze() {
   const ref = useRef<HTMLDivElement>(null);
 
@@ -37,11 +40,15 @@ export function LeafBreeze() {
   }, []);
 
   return (
-    <div className="breeze" ref={ref} aria-hidden="true">
+    <div
+      className="group/breeze pointer-events-none absolute inset-0 overflow-hidden motion-reduce:hidden"
+      ref={ref}
+      aria-hidden="true"
+    >
       {LEAVES.map(([top, size, dur, delay, color, sway], i) => (
         <span
           key={i}
-          className="breeze__leaf"
+          className={`${PLAY} absolute top-[var(--top)] left-0 block size-[var(--size)] animate-[breeze-drift_var(--dur)_linear_var(--delay)_infinite] opacity-80 [@media(hover:none),(max-width:640px)]:even:hidden`}
           style={
             {
               "--top": `${top}%`,
@@ -52,8 +59,13 @@ export function LeafBreeze() {
             } as CSSProperties
           }
         >
-          <span className="breeze__sway">
-            <svg className="breeze__spin" viewBox="0 0 24 24">
+          <span
+            className={`${PLAY} block size-full animate-[breeze-sway_calc(var(--dur)/4)_ease-in-out_var(--delay)_infinite_alternate]`}
+          >
+            <svg
+              className={`${PLAY} block size-full animate-[breeze-spin_calc(var(--dur)/5)_ease-in-out_var(--delay)_infinite_alternate]`}
+              viewBox="0 0 24 24"
+            >
               <path
                 d="M2 22 C 2 10 10 2 22 2 C 22 14 14 22 2 22 Z"
                 fill={color}

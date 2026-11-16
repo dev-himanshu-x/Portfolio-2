@@ -86,7 +86,7 @@ function Sunflower({ x, h, s }: { x: number; h: number; s: number }) {
 export function FooterGrass() {
   return (
     <svg
-      className="footer__grass"
+      className="pointer-events-none absolute bottom-[-1px] left-0 z-[2] h-[clamp(9rem,20vw,17rem)] w-full"
       viewBox={`0 0 ${W} ${H}`}
       preserveAspectRatio="xMidYMax slice"
       aria-hidden="true"

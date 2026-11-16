@@ -7,7 +7,7 @@ import { PROJECTS } from "@/content/projects";
 
 export default function Home() {
   return (
-    <main>
+    <main className="[.booting_&]:invisible">
       <SiteNav />
 
       {/* Act I–II: volcano hero → scroll-blended grove (one pinned world) */}

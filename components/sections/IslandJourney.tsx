@@ -6,10 +6,63 @@ import { type CSSProperties, useEffect, useRef } from "react";
 import { BakedScene } from "@/components/parallax/BakedScene";
 import { NightSky } from "@/components/parallax/NightSky";
 import { PaperParallax } from "@/components/parallax/PaperParallax";
+import { EYEBROW } from "@/components/ui";
 import { EXPERIENCE } from "@/content/experience";
 import { volcanoScene } from "@/scenes/volcanoScene";
 import { waterfallScene } from "@/scenes/waterfallScene";
 import { CURTAIN_HEIGHT, CURTAIN_TRAVEL, LavaCurtain } from "./LavaCurtain";
+
+const TAG_CORNERS = [
+  "top-0 left-0 border-r-0 border-b-0",
+  "top-0 right-0 border-b-0 border-l-0",
+  "bottom-0 left-0 border-t-0 border-r-0",
+  "right-0 bottom-0 border-t-0 border-l-0",
+];
+
+const HUD_TAG =
+  "absolute bottom-[clamp(1.6rem,6vh,3.4rem)] left-[clamp(1.4rem,4vw,3.2rem)] z-[5] m-0 px-[1.1rem] py-[0.9rem] pointer-events-none [@media(hover:none),(max-width:640px)]:backdrop-filter-none";
+const HUD_TAG_LIGHT = `${HUD_TAG} bg-[rgba(247,245,240,0.9)] text-ink backdrop-blur-[6px] [@media(hover:none),(max-width:640px)]:bg-[rgba(247,245,240,0.95)]`;
+const HUD_TAG_DARK = `${HUD_TAG} border border-[rgba(247,245,240,0.16)] bg-[rgba(23,16,52,0.55)] text-paper backdrop-blur-[8px] [@media(hover:none),(max-width:640px)]:bg-[rgba(23,16,52,0.8)]`;
+
+function HudTag({
+  dark,
+  plate,
+  title,
+  meta,
+}: {
+  dark?: boolean;
+  plate: string;
+  title: string;
+  meta: string;
+}) {
+  return (
+    <figure className={dark ? HUD_TAG_DARK : HUD_TAG_LIGHT} data-hud-tag>
+      {TAG_CORNERS.map((pos) => (
+        <i
+          key={pos}
+          className={`absolute size-3 border-[1.5px] ${dark ? "border-[rgba(247,245,240,0.85)]" : "border-ink"} ${pos}`}
+        />
+      ))}
+      <p className={`${EYEBROW} mb-[0.4rem]`}>{plate}</p>
+      <h2 className="mt-0 mb-[0.45rem] font-display text-[clamp(1.5rem,3.4vw,2.4rem)] leading-none font-extrabold">
+        {title}
+      </h2>
+      <p className="m-0 font-mono text-[0.66rem] tracking-[0.2em]">{meta}</p>
+    </figure>
+  );
+}
+
+const STAGE = "absolute inset-0 size-full will-change-[transform,opacity]";
+
+const ROLE_DOT =
+  "before:absolute before:top-1/2 before:left-0 before:-mt-2 before:box-border before:size-4 before:rounded-full before:border-2 before:border-[rgba(247,245,240,0.65)] before:bg-[#1b1340] before:transition-[background,border-color,box-shadow] before:duration-300 before:ease-[ease] before:content-[''] before:[transform:scale(var(--dot,1))] hover:before:border-white hover:before:bg-white hover:before:shadow-[0_0_12px_3px_rgba(255,255,255,0.7)]";
+const ROLE_LINE =
+  "not-last:after:absolute not-last:after:top-[calc(50%+8px)] not-last:after:left-[7px] not-last:after:h-[calc(100%-16px)] not-last:after:w-px not-last:after:origin-top not-last:after:bg-[rgba(247,245,240,0.3)] not-last:after:content-[''] not-last:after:[transform:scaleY(var(--line,1))]";
+const ROLE_SHINE =
+  "group-has-[[data-role]:hover]/work:not-last:after:bg-[linear-gradient(180deg,rgba(255,255,255,0.3),#fff,rgba(255,255,255,0.3))] group-has-[[data-role]:hover]/work:not-last:after:[background-size:100%_300%] group-has-[[data-role]:hover]/work:not-last:after:shadow-[0_0_8px_1px_rgba(255,255,255,0.7)] motion-safe:group-has-[[data-role]:hover]/work:not-last:after:animate-[connector-shine_1.2s_linear_infinite]";
+const ROLE_DIM =
+  "[@media(hover:hover)]:[&>*]:transition-opacity [@media(hover:hover)]:[&>*]:duration-300 [@media(hover:hover)]:group-has-[[data-role]:hover]/work:not-hover:[&>*]:opacity-40";
+const ROLE = `pointer-events-auto relative grid grid-cols-[1fr_auto] items-center gap-[clamp(1rem,4vw,2.25rem)] py-[1.1rem] pr-0 pl-[2.2rem] ${ROLE_DOT} ${ROLE_LINE} ${ROLE_SHINE} ${ROLE_DIM}`;
 
 const EMBERS = Array.from({ length: 16 }, (_, i) => ({
   x: ((i * 37 + 11) % 92) + 4,
@@ -133,7 +186,7 @@ export function IslandJourney() {
         0,
       );
       tl.to(
-        volcanoRef.current?.querySelector(".hud-tag") ?? null,
+        volcanoRef.current?.querySelector("[data-hud-tag]") ?? null,
         { autoAlpha: 0, duration: 0.1 },
         0,
       );
@@ -177,7 +230,7 @@ export function IslandJourney() {
         0.6,
       );
       tl.fromTo(
-        waterfallRef.current?.querySelector(".hud-tag") ?? null,
+        waterfallRef.current?.querySelector("[data-hud-tag]") ?? null,
         { autoAlpha: 0, y: 14 },
         { autoAlpha: 1, y: 0, duration: 0.14, ease: "power2.out" },
         0.9,
@@ -185,13 +238,13 @@ export function IslandJourney() {
 
       // WORK builds one role at a time: dot pops, connector draws down to the next
       tl.fromTo(
-        waterfallRef.current?.querySelector(".night-work .hud-eyebrow") ?? null,
+        waterfallRef.current?.querySelector("[data-work-eyebrow]") ?? null,
         { autoAlpha: 0, x: -20 },
         { autoAlpha: 1, x: 0, duration: 0.06, ease: "power2.out" },
         0.86,
       );
       gsap.utils
-        .toArray<HTMLElement>(".night-work__role", waterfallRef.current!)
+        .toArray<HTMLElement>("[data-role]", waterfallRef.current!)
         .forEach((el, i) => {
           tl.fromTo(
             el,
@@ -215,7 +268,7 @@ export function IslandJourney() {
         return ((p * CURTAIN_TRAVEL) / 100) * CURTAIN_HEIGHT - CURTAIN_HEIGHT;
       };
       gsap.utils
-        .toArray<HTMLElement>(".ember", embersRef.current!)
+        .toArray<HTMLElement>("[data-ember]", embersRef.current!)
         .forEach((el, i) => {
           const t = 0.77 + i * 0.0145;
           const rise = 110 + ((i * 53) % 90);
@@ -278,38 +331,65 @@ export function IslandJourney() {
   }, []);
 
   return (
-    <div className="journey-track" id="top" ref={trackRef}>
-      <section className="journey-stage" ref={stageRef}>
+    <div
+      className="h-[calc(100svh+var(--journey-run)*1svh)] [--journey-run:210] [@media(pointer:coarse)]:[--journey-run:160]"
+      id="top"
+      ref={trackRef}
+    >
+      <section
+        className="sticky top-0 h-dvh w-full overflow-hidden bg-[#171034]"
+        ref={stageRef}
+      >
         {/* beneath: the grove */}
-        <div className="stage-waterfall" ref={waterfallRef}>
-          <BakedScene layers={waterfallScene} layerClassName="wf-layer" />
+        <div className={`${STAGE} z-[1] opacity-0`} ref={waterfallRef}>
+          <BakedScene
+            className="absolute inset-0"
+            layers={waterfallScene}
+            layerClassName="wf-layer"
+          />
           <NightSky />
-          <div className="night-ground" aria-hidden="true" />
-          <div className="night-work">
-            <p className="hud-eyebrow">WORK</p>
+          <div
+            className="pointer-events-none absolute inset-x-0 bottom-0 z-[3] h-[44%] bg-[linear-gradient(to_top,#070412_0%,#070412_60%,rgba(7,4,18,0)_100%)]"
+            aria-hidden="true"
+          />
+          <div className="group/work pointer-events-none absolute top-[clamp(8.5rem,28vh,16rem)] left-[clamp(1.4rem,4vw,3.2rem)] z-[5] w-[min(36rem,calc(100vw-2*clamp(1.4rem,4vw,3.2rem)))] text-paper">
+            <p className={`${EYEBROW} mb-[0.9rem] text-lava`} data-work-eyebrow>
+              WORK
+            </p>
             {EXPERIENCE.map((r) => (
-              <div className="night-work__role" key={r.company}>
+              <div className={ROLE} data-role key={r.company}>
                 <div>
-                  <p className="night-work__company">{r.company}</p>
-                  <p className="night-work__title">{r.role}</p>
+                  <p className="m-0 font-display text-[clamp(1.05rem,1.6vw,1.3rem)] leading-[1.1] font-bold">
+                    {r.company}
+                  </p>
+                  <p className="mt-1 mb-0 text-[0.95rem] text-[rgba(247,245,240,0.65)]">
+                    {r.role}
+                  </p>
                 </div>
-                <p className="night-work__period">{r.period}</p>
+                <p className="m-0 text-right text-[0.9rem] text-[rgba(247,245,240,0.6)]">
+                  {r.period}
+                </p>
               </div>
             ))}
           </div>
-          <figure className="hud-tag">
-            <i /> <i /> <i /> <i />
-            <p className="hud-eyebrow">PLATE 02 — WORK</p>
-            <h2 className="hud-tag__title">Starfall Canopy</h2>
-            <p className="hud-tag__meta">STARS · COMET · FIREFLIES</p>
-          </figure>
+          <HudTag
+            dark
+            plate="PLATE 02 — WORK"
+            title="Starfall Canopy"
+            meta="STARS · COMET · FIREFLIES"
+          />
         </div>
 
         <LavaCurtain ref={curtainRef} />
-        <div className="lava-embers" ref={embersRef} aria-hidden="true">
+        <div
+          className="pointer-events-none absolute inset-0 z-[4]"
+          ref={embersRef}
+          aria-hidden="true"
+        >
           {EMBERS.map((e) => (
             <span
-              className="ember"
+              className="absolute size-[var(--s)] rounded-full bg-[radial-gradient(circle,#ffd66b_0%,#f26419_70%)] opacity-0 shadow-[0_0_8px_2px_rgba(242,100,25,0.7)]"
+              data-ember
               key={e.x}
               style={{ left: `${e.x}%`, "--s": `${e.size}px` } as CSSProperties}
             />
@@ -317,25 +397,36 @@ export function IslandJourney() {
         </div>
 
         {/* on top: the volcano hero */}
-        <div className="stage-volcano" ref={volcanoRef}>
-          <PaperParallax layers={volcanoScene} />
-          <div className="crater-glow" ref={craterRef} aria-hidden="true" />
+        <div
+          className={`${STAGE} z-[2] origin-[50%_43%] bg-[#f3ece1]`}
+          ref={volcanoRef}
+        >
+          <PaperParallax className="absolute inset-0" layers={volcanoScene} />
+          <div
+            className="pointer-events-none absolute top-[43%] left-1/2 z-[4] -mt-[23vmin] -ml-[23vmin] size-[46vmin] rounded-full bg-[radial-gradient(circle,rgba(255,214,107,0.95)_0%,rgba(242,100,25,0.7)_35%,rgba(193,48,10,0)_70%)] opacity-0"
+            ref={craterRef}
+            aria-hidden="true"
+          />
 
-          <div className="hero-id" ref={titleRef}>
-            <p className="hero-id__eyebrow">PORTFOLIO — FULL STACK DEVELOPER</p>
-            <h1 className="hero-id__name">
+          <div
+            className="pointer-events-none absolute top-[clamp(4.2rem,11vh,7rem)] left-[clamp(1.4rem,4vw,3.2rem)] z-[5] text-white mix-blend-difference [.intro_&>*]:opacity-0"
+            ref={titleRef}
+          >
+            <p className="m-0 font-mono text-[0.72rem] tracking-[0.3em]">
+              PORTFOLIO — FULL STACK DEVELOPER
+            </p>
+            <h1 className="mx-0 mt-[0.35rem] mb-[0.55rem] font-outline text-[clamp(3.4rem,11vw,9.5rem)] leading-[0.92] font-normal tracking-[0.01em] text-transparent [-webkit-text-stroke:2px_#fff]">
               HIMANSHU
               <br />
               JAISWAL
             </h1>
           </div>
 
-          <figure className="hud-tag">
-            <i /> <i /> <i /> <i />
-            <p className="hud-eyebrow">PLATE 01 — ERUPTION</p>
-            <h2 className="hud-tag__title">Ashfall Isle</h2>
-            <p className="hud-tag__meta">STACKED SVG · CURSOR / TILT DEPTH</p>
-          </figure>
+          <HudTag
+            plate="PLATE 01 — ERUPTION"
+            title="Ashfall Isle"
+            meta="STACKED SVG · CURSOR / TILT DEPTH"
+          />
         </div>
       </section>
     </div>
