@@ -1,7 +1,6 @@
 "use client";
 
-import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
+import { type ReactNode, useEffect, useRef, useState } from "react";
 import { EYEBROW } from "@/components/ui";
 import type { Project } from "@/content/projects";
 import { BigLeaf, FanLeaf } from "@/scenes/primitives/jungleShapes";
@@ -80,7 +79,13 @@ function Flora({ end }: { end?: boolean }) {
   );
 }
 
-export function ProjectsSection({ projects }: { projects: Project[] }) {
+export function ProjectsSection({
+  projects,
+  children,
+}: {
+  projects: Project[];
+  children?: ReactNode;
+}) {
   const ref = useRef<HTMLElement>(null);
   const [shown, setShown] = useState(PAGE);
 
@@ -143,31 +148,16 @@ export function ProjectsSection({ projects }: { projects: Project[] }) {
           {projects.slice(0, shown).map((p, i) => (
             <article
               key={p.title}
-              className={`group/card flex flex-col text-paper ${REVEAL}`}
+              className={`group/card flex flex-col rounded-[13px] bg-[rgba(247,245,240,0.03)] p-[clamp(1.2rem,2vw,1.7rem)] text-paper shadow-[0_0_0_1px_rgba(247,245,240,0.16)] transition-[box-shadow,background] duration-300 hover:bg-[rgba(247,245,240,0.06)] hover:shadow-[0_0_0_1px_var(--color-lava)] ${REVEAL}`}
               style={{ ["--i" as string]: (i % PAGE) + 2 }}
             >
-              <div className="relative aspect-[1.85/1] overflow-hidden rounded-[13px] bg-[rgba(247,245,240,0.06)] shadow-[0_0_0_1px_rgba(247,245,240,0.12)]">
-                {p.image ? (
-                  <Image
-                    src={p.image}
-                    alt={`${p.title} preview`}
-                    className="block size-full object-cover object-top transition-transform duration-[600ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover/card:scale-[1.03]"
-                    width={1280}
-                    height={800}
-                    sizes="(min-width: 1040px) 400px, (min-width: 700px) 50vw, 100vw"
-                  />
-                ) : (
-                  <div className="flex h-full flex-col items-center justify-center gap-[0.7rem] bg-[radial-gradient(circle_at_20%_15%,rgba(242,100,25,0.16),transparent_55%),radial-gradient(rgba(247,245,240,0.12)_1px,transparent_1.4px)_0_0/14px_14px,linear-gradient(135deg,#1f4a2d,#14241b)] p-4 text-center">
-                    <span className="font-outline text-[clamp(1.5rem,2.4vw,2rem)] leading-none tracking-[0.02em] text-[rgba(247,245,240,0.85)] uppercase">
-                      {p.title}
-                    </span>
-                    <small className="font-mono text-[0.62rem] tracking-[0.24em] text-[rgba(247,245,240,0.5)]">
-                      SOURCE ONLY
-                    </small>
-                  </div>
-                )}
-              </div>
-              <h3 className="mt-[0.9rem] mb-[0.4rem] font-display text-[1.3rem] leading-[1.15] font-bold">
+              <p className="mt-0 mb-[1.6rem] flex items-center justify-between font-mono text-[0.68rem] tracking-[0.2em] text-[rgba(247,245,240,0.5)]">
+                <span className="text-lava">
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+                <span>{p.source ? "OPEN SOURCE" : "LIVE"}</span>
+              </p>
+              <h3 className="mt-0 mb-[0.5rem] font-display text-[1.5rem] leading-[1.15] font-bold">
                 {p.title}
               </h3>
               {p.tech.length > 0 && (
@@ -226,6 +216,7 @@ export function ProjectsSection({ projects }: { projects: Project[] }) {
             </button>
           </div>
         )}
+        {children}
       </div>
     </section>
   );

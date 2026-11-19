@@ -1,5 +1,6 @@
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { SiteNav } from "@/components/layout/SiteNav";
+import { ActivitySection } from "@/components/sections/ActivitySection";
 import { IslandJourney } from "@/components/sections/IslandJourney";
 import { Marquee } from "@/components/sections/Marquee";
 import { ProjectsSection } from "@/components/sections/ProjectsSection";
@@ -16,7 +17,9 @@ export default function Home() {
       <Marquee />
 
       {/* Act III: selected work over dark jungle ink */}
-      <ProjectsSection projects={PROJECTS} />
+      <ProjectsSection projects={PROJECTS}>
+        <ActivitySection />
+      </ProjectsSection>
 
       {/* Act IV: correspondence */}
       <SiteFooter />
