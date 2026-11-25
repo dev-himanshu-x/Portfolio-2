@@ -8,8 +8,8 @@ import {
   useState,
 } from "react";
 import { useParallax } from "@/hooks/useParallax";
-import { markBaked } from "./bakeStatus";
-import { rasterizeLayer, yieldToMain } from "./rasterize";
+import { markBaked, markLayer } from "@/lib/parallax/bakeStatus";
+import { rasterizeLayer, yieldToMain } from "@/lib/parallax/rasterize";
 
 export interface ParallaxLayer {
   /** 0 = far / barely moves, 1 = nearest / moves most. */
@@ -67,18 +67,29 @@ export function PaperParallax({
     let cancelled = false;
     const urls: string[] = [];
     (async () => {
-      for (let i = 0; i < layers.length; i++) {
-        const url = await rasterizeLayer(svgs[i], layers[i].depth, "28,22,18");
-        await yieldToMain();
-        if (cancelled) {
-          URL.revokeObjectURL(url);
-          return;
+      try {
+        for (let i = 0; i < layers.length; i++) {
+          const url = await rasterizeLayer(
+            svgs[i],
+            layers[i].depth,
+            "28,22,18",
+          );
+          await yieldToMain();
+          if (cancelled) {
+            URL.revokeObjectURL(url);
+            return;
+          }
+          urls.push(url);
+          markLayer();
         }
-        urls.push(url);
-      }
-      if (!cancelled) {
-        setTextures(urls);
-        markBaked(id);
+        if (!cancelled) {
+          setTextures(urls);
+          markBaked(id);
+        }
+      } catch (err) {
+        // keep the live SVG and let the loader finish instead of stalling
+        console.warn("scene bake failed, using live SVG", err);
+        if (!cancelled) markBaked(id);
       }
     })();
 

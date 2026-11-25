@@ -23,7 +23,7 @@ Parallax is **scroll + pointer driven, combined**:
 
 ## Architecture (3 units)
 
-### 1. `useParallax` hook (`components/useParallax.ts`)
+### 1. `useParallax` hook (`hooks/useParallax.ts`)
 
 Single responsibility: turn raw input into smooth, normalized motion values.
 

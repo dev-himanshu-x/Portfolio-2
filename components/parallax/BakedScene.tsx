@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect, useId, useRef, useState } from "react";
-import { markBaked } from "./bakeStatus";
+import { markBaked, markLayer } from "@/lib/parallax/bakeStatus";
+import { rasterizeLayer, yieldToMain } from "@/lib/parallax/rasterize";
 import type { ParallaxLayer } from "./PaperParallax";
-import { rasterizeLayer, yieldToMain } from "./rasterize";
 
 interface BakedSceneProps {
   layers: ParallaxLayer[];
@@ -39,18 +39,25 @@ export function BakedScene({
     let cancelled = false;
     const urls: string[] = [];
     (async () => {
-      for (let i = 0; i < layers.length; i++) {
-        const url = await rasterizeLayer(svgs[i], layers[i].depth, null);
-        if (cancelled) {
-          URL.revokeObjectURL(url);
-          return;
+      try {
+        for (let i = 0; i < layers.length; i++) {
+          const url = await rasterizeLayer(svgs[i], layers[i].depth, null);
+          if (cancelled) {
+            URL.revokeObjectURL(url);
+            return;
+          }
+          urls.push(url);
+          markLayer();
+          await yieldToMain();
         }
-        urls.push(url);
-        await yieldToMain();
-      }
-      if (!cancelled) {
-        setTextures(urls);
-        markBaked(id);
+        if (!cancelled) {
+          setTextures(urls);
+          markBaked(id);
+        }
+      } catch (err) {
+        // keep the live SVG and let the loader finish instead of stalling
+        console.warn("scene bake failed, using live SVG", err);
+        if (!cancelled) markBaked(id);
       }
     })();
 
@@ -76,7 +83,7 @@ export function BakedScene({
         >
           {baked ? (
             <img
-              className="block size-full object-cover object-center"
+              className="block size-full object-cover object-center max-md:object-[8%_50%]"
               src={textures![i]}
               alt=""
               draggable={false}

@@ -5,7 +5,7 @@ import { scrollToY } from "@/components/providers/SmoothScroll";
 import { SITE } from "@/content/site";
 
 const NAV_BASE =
-  "fixed inset-x-0 top-0 z-[60] flex items-center justify-between gap-6 px-[clamp(1.25rem,3vw,2.2rem)] py-[1.1rem] font-mono text-[0.72rem] tracking-[0.16em] transition-[background-color] duration-300 ease-[ease]";
+  "fixed inset-x-0 top-0 z-[60] flex items-center justify-between gap-6 px-[clamp(1.25rem,3vw,2.2rem)] max-[640px]:gap-3 max-[640px]:text-[0.62rem] max-[640px]:tracking-[0.06em] py-[1.1rem] font-mono text-[0.72rem] tracking-[0.16em] transition-[background-color] duration-300 ease-[ease]";
 const NAV_OVER_ART = "pointer-events-none text-white mix-blend-difference";
 const NAV_SOLID =
   "pointer-events-auto border-b border-[rgba(247,245,240,0.12)] bg-[rgba(20,36,27,0.94)] text-paper backdrop-blur-[10px] [@media(hover:none),(max-width:640px)]:backdrop-filter-none";
@@ -45,15 +45,21 @@ export function SiteNav() {
           href="#top"
         >
           {SITE.firstName}
-          <span className="ml-[0.2em] align-super font-mono text-[0.62rem] font-normal opacity-75">
+          <span className="ml-[0.2em] align-super max-[400px]:hidden font-mono text-[0.62rem] font-normal opacity-75">
             ©{SITE.year}
           </span>
         </a>
-        <nav className="flex gap-8 max-[640px]:hidden">
+        <nav className="flex gap-8 max-[640px]:gap-3.5">
           <button
             type="button"
             className={NAV_LINK}
             onClick={() => {
+              // phones: page 2 is a normal section, so go straight to it
+              const page2 = document.getElementById("experience");
+              if (page2 && !window.matchMedia("(min-width: 768px)").matches) {
+                scrollToY(page2.getBoundingClientRect().top + window.scrollY);
+                return;
+              }
               const track = document.getElementById("top");
               if (!track) return;
               const run = track.offsetHeight - window.innerHeight;
@@ -69,7 +75,7 @@ export function SiteNav() {
             CONTACT
           </a>
         </nav>
-        <p className={`${NAV_ITEM} flex items-center gap-2`}>
+        <p className={`${NAV_ITEM} flex items-center gap-2 max-[640px]:hidden`}>
           {SITE.role.toUpperCase()}
         </p>
       </header>

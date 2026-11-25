@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { prefersReducedMotion } from "@/lib/media";
 
 /**
  * Turns raw scroll + pointer (and mobile tilt) input into smooth, normalized
@@ -21,9 +22,7 @@ export function useParallax<T extends HTMLElement>() {
     const el = ref.current;
     if (!el) return;
 
-    const reduce = window.matchMedia(
-      "(prefers-reduced-motion: reduce)",
-    ).matches;
+    const reduce = prefersReducedMotion();
     if (reduce) {
       el.style.setProperty("--scroll", "0");
       el.style.setProperty("--px", "0");

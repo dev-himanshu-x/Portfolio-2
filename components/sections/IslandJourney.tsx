@@ -6,8 +6,9 @@ import { type CSSProperties, useEffect, useRef } from "react";
 import { BakedScene } from "@/components/parallax/BakedScene";
 import { NightSky } from "@/components/parallax/NightSky";
 import { PaperParallax } from "@/components/parallax/PaperParallax";
-import { EYEBROW } from "@/components/ui";
 import { EXPERIENCE } from "@/content/experience";
+import { isCoarsePointer, prefersReducedMotion } from "@/lib/media";
+import { EYEBROW } from "@/lib/styles";
 import { volcanoScene } from "@/scenes/volcanoScene";
 import { waterfallScene } from "@/scenes/waterfallScene";
 import { CURTAIN_HEIGHT, CURTAIN_TRAVEL, LavaCurtain } from "./LavaCurtain";
@@ -20,7 +21,7 @@ const TAG_CORNERS = [
 ];
 
 const HUD_TAG =
-  "absolute bottom-[clamp(1.6rem,6vh,3.4rem)] left-[clamp(1.4rem,4vw,3.2rem)] z-[5] m-0 px-[1.1rem] py-[0.9rem] pointer-events-none [@media(hover:none),(max-width:640px)]:backdrop-filter-none";
+  "absolute bottom-[clamp(1.6rem,6vh,3.4rem)] left-gutter z-[5] m-0 max-w-[calc(100%-2*var(--spacing-gutter))] px-[1.1rem] py-[0.9rem] pointer-events-none [@media(hover:none),(max-width:640px)]:backdrop-filter-none";
 const HUD_TAG_LIGHT = `${HUD_TAG} bg-[rgba(247,245,240,0.9)] text-ink backdrop-blur-[6px] [@media(hover:none),(max-width:640px)]:bg-[rgba(247,245,240,0.95)]`;
 const HUD_TAG_DARK = `${HUD_TAG} border border-[rgba(247,245,240,0.16)] bg-[rgba(23,16,52,0.55)] text-paper backdrop-blur-[8px] [@media(hover:none),(max-width:640px)]:bg-[rgba(23,16,52,0.8)]`;
 
@@ -47,12 +48,15 @@ function HudTag({
       <h2 className="mt-0 mb-[0.45rem] font-display text-[clamp(1.5rem,3.4vw,2.4rem)] leading-none font-extrabold">
         {title}
       </h2>
-      <p className="m-0 font-mono text-[0.66rem] tracking-[0.2em]">{meta}</p>
+      <p className="m-0 font-mono text-[0.66rem] tracking-[0.2em] max-[640px]:tracking-[0.12em]">
+        {meta}
+      </p>
     </figure>
   );
 }
 
-const STAGE = "absolute inset-0 size-full will-change-[transform,opacity]";
+const STAGE =
+  "absolute inset-0 size-full will-change-[transform,opacity] max-md:relative max-md:inset-auto max-md:h-svh max-md:min-h-[34rem] max-md:will-change-auto";
 
 const ROLE_DOT =
   "before:absolute before:top-1/2 before:left-0 before:-mt-2 before:box-border before:size-4 before:rounded-full before:border-2 before:border-[rgba(247,245,240,0.65)] before:bg-[#1b1340] before:transition-[background,border-color,box-shadow] before:duration-300 before:ease-[ease] before:content-[''] before:[transform:scale(var(--dot,1))] hover:before:border-white hover:before:bg-white hover:before:shadow-[0_0_12px_3px_rgba(255,255,255,0.7)]";
@@ -62,7 +66,7 @@ const ROLE_SHINE =
   "group-has-[[data-role]:hover]/work:not-last:after:bg-[linear-gradient(180deg,rgba(255,255,255,0.3),#fff,rgba(255,255,255,0.3))] group-has-[[data-role]:hover]/work:not-last:after:[background-size:100%_300%] group-has-[[data-role]:hover]/work:not-last:after:shadow-[0_0_8px_1px_rgba(255,255,255,0.7)] motion-safe:group-has-[[data-role]:hover]/work:not-last:after:animate-[connector-shine_1.2s_linear_infinite]";
 const ROLE_DIM =
   "[@media(hover:hover)]:[&>*]:transition-opacity [@media(hover:hover)]:[&>*]:duration-300 [@media(hover:hover)]:group-has-[[data-role]:hover]/work:not-hover:[&>*]:opacity-40";
-const ROLE = `pointer-events-auto relative grid grid-cols-[1fr_auto] items-center gap-[clamp(1rem,4vw,2.25rem)] py-[1.1rem] pr-0 pl-[2.2rem] ${ROLE_DOT} ${ROLE_LINE} ${ROLE_SHINE} ${ROLE_DIM}`;
+const ROLE = `pointer-events-auto relative grid grid-cols-[1fr_auto] items-center gap-[clamp(1rem,4vw,2.25rem)] max-[640px]:grid-cols-1 max-[640px]:gap-1 py-[1.1rem] pr-0 pl-[2.2rem] ${ROLE_DOT} ${ROLE_LINE} ${ROLE_SHINE} ${ROLE_DIM}`;
 
 const EMBERS = Array.from({ length: 16 }, (_, i) => ({
   x: ((i * 37 + 11) % 92) + 4,
@@ -88,15 +92,14 @@ export function IslandJourney() {
 
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger);
+
+    const reduce = prefersReducedMotion();
+
     // the mobile URL bar collapsing resizes the viewport; without this every
     // swipe re-measures the scroll layout and stutters
     ScrollTrigger.config({ ignoreMobileResize: true });
 
-    const touch = window.matchMedia("(pointer: coarse)").matches;
-    const reduce = window.matchMedia(
-      "(prefers-reduced-motion: reduce)",
-    ).matches;
-
+    const touch = isCoarsePointer();
     ScrollTrigger.clearScrollMemory("manual");
 
     const root = document.documentElement;
@@ -120,7 +123,14 @@ export function IslandJourney() {
 
     let startIntro: (() => void) | undefined;
 
-    const ctx = gsap.context(() => {
+    const mm = gsap.matchMedia();
+
+    // phones: no pinned timeline, just two stacked pages (layout is CSS-only)
+    mm.add("(max-width: 767px)", () => {
+      root.classList.remove("intro", "booting");
+    });
+
+    mm.add("(min-width: 768px)", () => {
       const wfLayers = gsap.utils.toArray<HTMLElement>(
         ".wf-layer",
         waterfallRef.current!,
@@ -315,7 +325,7 @@ export function IslandJourney() {
         ScrollTrigger.update();
         tl.progress(st.progress);
       }
-    }, stageRef);
+    });
 
     const reveal = requestAnimationFrame(() =>
       root.classList.remove("booting"),
@@ -326,22 +336,26 @@ export function IslandJourney() {
       window.removeEventListener("scroll", remember);
       if (startIntro) window.removeEventListener("site-ready", startIntro);
       root.classList.remove("booting");
-      ctx.revert();
+      mm.revert();
     };
   }, []);
 
   return (
     <div
-      className="h-[calc(100svh+var(--journey-run)*1svh)] [--journey-run:210] [@media(pointer:coarse)]:[--journey-run:160]"
+      className="h-[calc(100svh+var(--journey-run)*1svh)] [--journey-run:210] max-md:h-auto"
       id="top"
       ref={trackRef}
     >
       <section
-        className="sticky top-0 h-dvh w-full overflow-hidden bg-[#171034]"
+        className="sticky top-0 h-dvh w-full overflow-hidden bg-[#171034] max-md:static max-md:flex max-md:h-auto max-md:flex-col max-md:overflow-visible"
         ref={stageRef}
       >
         {/* beneath: the grove */}
-        <div className={`${STAGE} z-[1] opacity-0`} ref={waterfallRef}>
+        <div
+          className={`${STAGE} z-[1] opacity-0 max-md:order-2 max-md:opacity-100`}
+          id="experience"
+          ref={waterfallRef}
+        >
           <BakedScene
             className="absolute inset-0"
             layers={waterfallScene}
@@ -352,7 +366,7 @@ export function IslandJourney() {
             className="pointer-events-none absolute inset-x-0 bottom-0 z-[3] h-[44%] bg-[linear-gradient(to_top,#070412_0%,#070412_60%,rgba(7,4,18,0)_100%)]"
             aria-hidden="true"
           />
-          <div className="group/work pointer-events-none absolute top-[clamp(8.5rem,28vh,16rem)] left-[clamp(1.4rem,4vw,3.2rem)] z-[5] w-[min(36rem,calc(100vw-2*clamp(1.4rem,4vw,3.2rem)))] text-paper">
+          <div className="group/work pointer-events-none absolute top-[clamp(8.5rem,28vh,16rem)] left-gutter z-[5] w-[min(36rem,calc(100vw-2*var(--spacing-gutter)))] text-paper">
             <p className={`${EYEBROW} mb-[0.9rem] text-lava`} data-work-eyebrow>
               WORK
             </p>
@@ -366,7 +380,7 @@ export function IslandJourney() {
                     {r.role}
                   </p>
                 </div>
-                <p className="m-0 text-right text-[0.9rem] text-[rgba(247,245,240,0.6)]">
+                <p className="m-0 text-right text-[0.9rem] text-[rgba(247,245,240,0.6)] max-[640px]:text-left max-[640px]:text-[0.82rem]">
                   {r.period}
                 </p>
               </div>
@@ -382,7 +396,7 @@ export function IslandJourney() {
 
         <LavaCurtain ref={curtainRef} />
         <div
-          className="pointer-events-none absolute inset-0 z-[4]"
+          className="pointer-events-none absolute inset-0 z-[4] max-md:hidden"
           ref={embersRef}
           aria-hidden="true"
         >
@@ -398,21 +412,21 @@ export function IslandJourney() {
 
         {/* on top: the volcano hero */}
         <div
-          className={`${STAGE} z-[2] origin-[50%_43%] bg-[#f3ece1]`}
+          className={`${STAGE} z-[2] origin-[50%_43%] bg-[#f3ece1] max-md:order-1`}
           ref={volcanoRef}
         >
           <PaperParallax className="absolute inset-0" layers={volcanoScene} />
           <div
-            className="pointer-events-none absolute top-[43%] left-1/2 z-[4] -mt-[23vmin] -ml-[23vmin] size-[46vmin] rounded-full bg-[radial-gradient(circle,rgba(255,214,107,0.95)_0%,rgba(242,100,25,0.7)_35%,rgba(193,48,10,0)_70%)] opacity-0"
+            className="pointer-events-none absolute top-[43%] left-1/2 z-[4] max-md:hidden -mt-[23vmin] -ml-[23vmin] size-[46vmin] rounded-full bg-[radial-gradient(circle,rgba(255,214,107,0.95)_0%,rgba(242,100,25,0.7)_35%,rgba(193,48,10,0)_70%)] opacity-0"
             ref={craterRef}
             aria-hidden="true"
           />
 
           <div
-            className="pointer-events-none absolute top-[clamp(4.2rem,11vh,7rem)] left-[clamp(1.4rem,4vw,3.2rem)] z-[5] text-white mix-blend-difference [.intro_&>*]:opacity-0"
+            className="pointer-events-none absolute top-[clamp(4.2rem,11vh,7rem)] left-gutter z-[5] text-white mix-blend-difference [.intro_&>*]:opacity-0"
             ref={titleRef}
           >
-            <p className="m-0 font-mono text-[0.72rem] tracking-[0.3em]">
+            <p className="m-0 font-mono text-[0.72rem] tracking-[0.3em] max-[640px]:text-[0.6rem] max-[640px]:tracking-[0.16em]">
               PORTFOLIO — FULL STACK DEVELOPER
             </p>
             <h1 className="mx-0 mt-[0.35rem] mb-[0.55rem] font-outline text-[clamp(3.4rem,11vw,9.5rem)] leading-[0.92] font-normal tracking-[0.01em] text-transparent [-webkit-text-stroke:2px_#fff]">

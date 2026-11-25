@@ -1,6 +1,7 @@
 import Image from "next/image";
-import { EYEBROW } from "@/components/ui";
+import { OutlineText } from "@/components/ui/outline-text";
 import { LINKS, SITE } from "@/content/site";
+import { EYEBROW } from "@/lib/styles";
 import { FooterGrass } from "./FooterGrass";
 
 /** Contact footer — calm centred call-to-action over a paper-cut meadow. */
@@ -13,9 +14,12 @@ export function SiteFooter() {
       <p className={`${EYEBROW} mb-[0.4rem] text-ink-soft`}>
         PLATE 04 — CORRESPONDENCE
       </p>
-      <p className="mx-0 mt-[0.8rem] mb-[2.4rem] inline-block font-outline text-[clamp(2.6rem,7vw,5.5rem)] leading-[0.95] font-normal text-transparent no-underline transition-[color,-webkit-text-stroke-color] duration-[350ms] ease-[ease] [-webkit-text-stroke:2px_var(--color-ink)] hover:text-lava hover:[-webkit-text-stroke-color:var(--color-ember)]">
+      <OutlineText
+        as="p"
+        className="mx-0 mt-[0.8rem] mb-[2.4rem] inline-block text-transparent no-underline transition-[color,-webkit-text-stroke-color] duration-[350ms] ease-[ease] [-webkit-text-stroke:2px_var(--color-ink)] hover:text-lava hover:[-webkit-text-stroke-color:var(--color-ember)]"
+      >
         GET IN TOUCH
-      </p>
+      </OutlineText>
       <div className="flex flex-wrap justify-center gap-x-[2.4rem] gap-y-4 font-mono text-[0.72rem] tracking-[0.2em]">
         {LINKS.map((l) => (
           <a

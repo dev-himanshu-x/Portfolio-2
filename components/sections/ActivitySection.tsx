@@ -1,12 +1,15 @@
+"use client";
+
+import { useState } from "react";
 import activity from "@/content/generated/activity.json";
 import { LINKS } from "@/content/site";
 
 const LEVEL = [
-  "bg-[rgba(247,245,240,0.08)]",
-  "bg-[rgba(193,48,10,0.3)]",
-  "bg-[rgba(193,48,10,0.6)]",
-  "bg-ember",
-  "bg-lava",
+  "bg-[#263d2f]",
+  "bg-[#2f7a3b]",
+  "bg-[#43a14e]",
+  "bg-[#6fcf6b]",
+  "bg-[#c4f58a]",
 ];
 
 const MONTHS = [
@@ -24,6 +27,19 @@ const MONTHS = [
   "Dec",
 ];
 
+const dateFormat = new Intl.DateTimeFormat("en-IN", {
+  day: "numeric",
+  month: "long",
+  year: "numeric",
+  timeZone: "UTC",
+});
+
+function dayLabel(date: string, count: number) {
+  const when = dateFormat.format(new Date(`${date}T00:00:00Z`));
+  if (count === 0) return `No contributions on ${when}`;
+  return `${count} ${count === 1 ? "contribution" : "contributions"} on ${when}`;
+}
+
 const github = LINKS.find((l) => l.label === "GITHUB")?.href;
 
 const weeks = Math.ceil(activity.days.length / 7);
@@ -37,6 +53,10 @@ const monthLabels = activity.days
 
 /** GitHub contribution calendar, redrawn in the site palette from content/generated/activity.json. */
 export function ActivitySection() {
+  const [tip, setTip] = useState<{ text: string; x: number; y: number } | null>(
+    null,
+  );
+
   return (
     <div
       className="mt-[clamp(4rem,10vh,7rem)] border-t border-[rgba(247,245,240,0.2)] pt-[clamp(2.5rem,7vh,4.5rem)] text-paper"
@@ -76,13 +96,21 @@ export function ActivitySection() {
             className="grid grid-flow-col grid-rows-7 gap-[5px]"
             style={{ gridTemplateColumns: `repeat(${weeks}, 1fr)` }}
             role="img"
+            onPointerOver={(e) => {
+              const cell = e.target as HTMLElement;
+              const text = cell.dataset.tip;
+              if (!text) return;
+              const r = cell.getBoundingClientRect();
+              setTip({ text, x: r.left + r.width / 2, y: r.top });
+            }}
+            onPointerLeave={() => setTip(null)}
             aria-label={`${activity.total} contributions on GitHub in the last year`}
           >
             {activity.days.map((d) => (
               <span
                 key={d.date}
-                title={`${d.count} on ${d.date}`}
-                className={`aspect-square rounded-[4px] ${LEVEL[d.level]}`}
+                data-tip={dayLabel(d.date, d.count)}
+                className={`aspect-square rounded-[4px] transition-transform duration-150 hover:z-10 hover:scale-150 ${LEVEL[d.level]}`}
               />
             ))}
           </div>
@@ -98,6 +126,18 @@ export function ActivitySection() {
           </div>
         </div>
       </div>
+      {tip && (
+        <div
+          className="pointer-events-none fixed z-[70] -translate-x-1/2 -translate-y-[calc(100%+10px)] rounded-md bg-paper px-3 py-1.5 text-[0.8rem] whitespace-nowrap text-ink shadow-lg"
+          style={{
+            left: Math.min(Math.max(tip.x, 90), window.innerWidth - 90),
+            top: tip.y,
+          }}
+          role="tooltip"
+        >
+          {tip.text}
+        </div>
+      )}
     </div>
   );
 }

@@ -57,7 +57,7 @@ export function LavaCurtain({ ref }: { ref: Ref<SVGSVGElement> }) {
   return (
     <svg
       ref={ref}
-      className="pointer-events-none absolute bottom-full left-0 z-[4] h-[260%] w-full will-change-transform"
+      className="pointer-events-none absolute bottom-full max-md:hidden left-0 z-[4] h-[260%] w-full will-change-transform"
       viewBox={`0 0 ${W} ${H}`}
       preserveAspectRatio="none"
       aria-hidden="true"

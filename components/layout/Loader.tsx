@@ -1,13 +1,16 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { bakedCount, onBake } from "@/components/parallax/bakeStatus";
+import { bakedCount, layerCount, onBake } from "@/lib/parallax/bakeStatus";
 import { Cloud, Layer } from "@/scenes/primitives/shapes";
+import { volcanoScene } from "@/scenes/volcanoScene";
+import { waterfallScene } from "@/scenes/waterfallScene";
 import { LoaderOwl } from "./LoaderOwl";
 
 const SKY = "pointer-events-none absolute -inset-[5%] will-change-transform";
 const SCENES = 2;
-const STEPS = SCENES + 2;
+const LAYERS = volcanoScene.length + waterfallScene.length;
+const STEPS = LAYERS + 2;
 const MIN_MS = 1200;
 const GIVE_UP_MS = 10000;
 const SCROLL_KEYS = new Set([
@@ -95,9 +98,9 @@ export function Loader() {
       const done =
         (loaded ? 1 : 0) +
         (fontsReady ? 1 : 0) +
-        Math.min(bakedCount(), SCENES);
+        Math.min(layerCount(), LAYERS);
       target = (done / STEPS) * 100;
-      ready = done >= STEPS;
+      ready = loaded && fontsReady && bakedCount() >= SCENES;
     };
 
     const onLoad = () => {
@@ -172,7 +175,7 @@ export function Loader() {
             <span ref={pctRef}>0%</span>
           </p>
           <div className="h-[6px] bg-[rgba(26,26,26,0.14)]">
-            <i className="block h-full origin-left bg-[linear-gradient(90deg,var(--color-ember),var(--color-lava),#fbb13c)] [transform:scaleX(var(--p,0))]" />
+            <i className="block h-full origin-left transition-transform duration-300 ease-linear bg-[linear-gradient(90deg,var(--color-ember),var(--color-lava),#fbb13c)] [transform:scaleX(var(--p,0))]" />
           </div>
         </div>
       </div>

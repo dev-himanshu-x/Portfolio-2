@@ -4,6 +4,7 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import type Lenis from "lenis";
 import { useEffect } from "react";
+import { prefersReducedMotion } from "@/lib/media";
 
 let instance: Lenis | null = null;
 
@@ -19,12 +20,7 @@ export function scrollToY(y: number) {
 
 export function SmoothScroll() {
   useEffect(() => {
-    // touch devices keep native momentum scrolling: it is smoother than a JS
-    // scroll loop and lets the Lenis chunk stay out of the download entirely
-    if (
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches ||
-      window.matchMedia("(pointer: coarse)").matches
-    ) {
+    if (prefersReducedMotion()) {
       return;
     }
 
@@ -42,6 +38,7 @@ export function SmoothScroll() {
         orientation: "vertical",
         gestureOrientation: "vertical",
         smoothWheel: true,
+        syncTouch: true,
         wheelMultiplier: 1.0,
         anchors: true,
       });

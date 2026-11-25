@@ -1,3 +1,5 @@
+import { isCoarsePointer } from "@/lib/media";
+
 const ART_W = 1600;
 const ART_H = 1000;
 
@@ -6,7 +8,7 @@ const ART_H = 1000;
 function textureScale() {
   const nav = navigator as Navigator & { deviceMemory?: number };
   const weak =
-    window.matchMedia("(pointer: coarse)").matches ||
+    isCoarsePointer() ||
     (nav.deviceMemory ?? 8) <= 4 ||
     (navigator.hardwareConcurrency ?? 8) <= 4;
   return weak ? 1 : Math.min(window.devicePixelRatio || 1, 1.5);
@@ -83,6 +85,8 @@ export async function rasterizeLayer(
   const blob = await new Promise<Blob | null>((res) =>
     canvas.toBlob(res, "image/png"),
   );
+  // release the pixel buffer now; iOS Safari caps total canvas memory
+  canvas.width = canvas.height = 0;
   if (!blob) return svgUrl;
   const url = URL.createObjectURL(blob);
   // decode off the main thread now, not on the first frame the layer shows

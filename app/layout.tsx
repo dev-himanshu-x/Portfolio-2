@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import {
   Anton,
   Bricolage_Grotesque,
@@ -34,6 +34,12 @@ const mono = Space_Mono({
   weight: "400",
   variable: "--nf-mono",
 });
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  themeColor: "#171034",
+};
 
 export const metadata: Metadata = {
   title: SITE.title,

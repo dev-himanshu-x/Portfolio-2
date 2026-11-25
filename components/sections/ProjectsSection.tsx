@@ -1,8 +1,14 @@
 "use client";
 
-import { type ReactNode, useEffect, useRef, useState } from "react";
-import { EYEBROW } from "@/components/ui";
+import type { LucideIcon } from "lucide-react";
+import { type ComponentType, type ReactNode, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { ExternalIcon, GithubIcon } from "@/components/ui/icons";
+import { OutlineText, Stroke } from "@/components/ui/outline-text";
 import type { Project } from "@/content/projects";
+import { useRevealOnScroll } from "@/hooks/useRevealOnScroll";
+import { EYEBROW, revealIndex } from "@/lib/styles";
 import { BigLeaf, FanLeaf } from "@/scenes/primitives/jungleShapes";
 import { Palm } from "@/scenes/primitives/shapes";
 import { LeafBreeze } from "./LeafBreeze";
@@ -17,32 +23,25 @@ const PAGE = 8;
 
 const REVEAL =
   "motion-safe:opacity-0 motion-safe:group-data-[in]/work:animate-[work-rise_0.7s_cubic-bezier(0.22,1,0.36,1)_calc(var(--i,0)*0.09s)_backwards] motion-safe:group-data-[in]/work:opacity-100";
-const CARD_LINK =
-  "inline-flex items-center gap-[0.4rem] text-[0.86rem] text-paper no-underline transition-colors duration-[250ms] ease-[ease] hover:text-lava [&:last-child:not(:first-child)]:text-[rgba(247,245,240,0.6)] [&>svg]:size-[1.1em]";
-
-function ExternalIcon() {
+function ProjectLink({
+  href,
+  icon: Icon,
+  children,
+}: {
+  href: string;
+  icon: LucideIcon | ComponentType<{ className?: string }>;
+  children: ReactNode;
+}) {
   return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
+    <Button
+      asChild
+      variant="link"
+      className="h-auto gap-[0.4rem] p-0 text-[0.86rem] font-normal text-paper no-underline hover:text-lava hover:no-underline [&:last-child:not(:first-child)]:text-muted-foreground [&>svg]:size-[1.1em]"
     >
-      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-      <path d="M15 3h6v6" />
-      <path d="M10 14 21 3" />
-    </svg>
-  );
-}
-
-function GithubIcon() {
-  return (
-    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-      <path d="M12 .5a11.5 11.5 0 0 0-3.64 22.41c.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.37-3.88-1.37-.52-1.33-1.28-1.69-1.28-1.69-1.04-.71.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.76 2.7 1.25 3.36.96.1-.75.4-1.25.73-1.54-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.78 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.83 1.19 3.09 0 4.42-2.69 5.4-5.26 5.68.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 12 .5Z" />
-    </svg>
+      <a href={href} target="_blank" rel="noreferrer">
+        <Icon /> {children}
+      </a>
+    </Button>
   );
 }
 
@@ -86,31 +85,12 @@ export function ProjectsSection({
   projects: Project[];
   children?: ReactNode;
 }) {
-  const ref = useRef<HTMLElement>(null);
+  const ref = useRevealOnScroll<HTMLElement>();
   const [shown, setShown] = useState(PAGE);
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const check = () => {
-      if (el.getBoundingClientRect().top < window.innerHeight * 0.7) {
-        el.setAttribute("data-in", "");
-        window.removeEventListener("scroll", check);
-        window.removeEventListener("resize", check);
-      }
-    };
-    check();
-    window.addEventListener("scroll", check, { passive: true });
-    window.addEventListener("resize", check);
-    return () => {
-      window.removeEventListener("scroll", check);
-      window.removeEventListener("resize", check);
-    };
-  }, []);
 
   return (
     <section
-      className="group/work relative overflow-hidden bg-ink-green px-[clamp(1.4rem,5vw,4rem)] pt-[clamp(4rem,10vh,7rem)] pb-[clamp(5rem,12vh,8rem)] text-paper"
+      className="group/work relative overflow-hidden bg-ink-green px-gutter-lg pt-[clamp(4rem,10vh,7rem)] pb-[clamp(5rem,12vh,8rem)] text-paper"
       id="work"
       ref={ref}
     >
@@ -122,22 +102,19 @@ export function ProjectsSection({
         <div>
           <p
             className={`${EYEBROW} mb-[0.4rem] text-lava ${REVEAL}`}
-            style={{ ["--i" as string]: 0 }}
+            style={revealIndex(0)}
           >
             PLATE 03 — PROJECTS
           </p>
-          <h2
-            className={`mt-0 mb-[1.4rem] font-outline text-[clamp(2.6rem,7vw,5.5rem)] leading-[0.95] font-normal ${REVEAL}`}
-            style={{ ["--i" as string]: 1 }}
+          <OutlineText
+            className={`mt-0 mb-[1.4rem] ${REVEAL}`}
+            style={revealIndex(1)}
           >
-            FEATURED{" "}
-            <em className="text-transparent not-italic [-webkit-text-stroke:2px_var(--color-paper)]">
-              WORKS
-            </em>
-          </h2>
+            FEATURED <Stroke color="var(--color-paper)">WORKS</Stroke>
+          </OutlineText>
           <p
             className={`mt-0 mb-[1.6rem] max-w-[34rem] text-[1.05rem] leading-[1.55] text-[rgba(247,245,240,0.7)] ${REVEAL}`}
-            style={{ ["--i" as string]: 2 }}
+            style={revealIndex(2)}
           >
             Live previews and source code for what I have built.
           </p>
@@ -146,10 +123,10 @@ export function ProjectsSection({
 
         <div className="grid grid-cols-1 gap-x-[clamp(1.2rem,2.2vw,1.8rem)] gap-y-[clamp(3.4rem,7vw,5rem)] min-[700px]:grid-cols-2 min-[1040px]:grid-cols-3">
           {projects.slice(0, shown).map((p, i) => (
-            <article
+            <Card
               key={p.title}
-              className={`group/card flex flex-col rounded-[13px] bg-[rgba(247,245,240,0.03)] p-[clamp(1.2rem,2vw,1.7rem)] text-paper shadow-[0_0_0_1px_rgba(247,245,240,0.16)] transition-[box-shadow,background] duration-300 hover:bg-[rgba(247,245,240,0.06)] hover:shadow-[0_0_0_1px_var(--color-lava)] ${REVEAL}`}
-              style={{ ["--i" as string]: (i % PAGE) + 2 }}
+              className={`group/card gap-0 rounded-[13px] border-0 bg-[rgba(247,245,240,0.03)] p-[clamp(1.2rem,2vw,1.7rem)] text-paper shadow-[0_0_0_1px_rgba(247,245,240,0.16)] transition-[box-shadow,background] duration-300 hover:bg-[rgba(247,245,240,0.06)] hover:shadow-[0_0_0_1px_var(--color-lava)] ${REVEAL}`}
+              style={revealIndex((i % PAGE) + 2)}
             >
               <p className="mt-0 mb-[1.6rem] flex items-center justify-between font-mono text-[0.68rem] tracking-[0.2em] text-[rgba(247,245,240,0.5)]">
                 <span className="text-lava">
@@ -172,27 +149,17 @@ export function ProjectsSection({
               )}
               <p className="mt-auto mb-0 flex flex-wrap gap-x-[1.2rem] gap-y-2 pt-[0.2rem]">
                 {p.live && (
-                  <a
-                    className={CARD_LINK}
-                    href={p.live}
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    <ExternalIcon /> Live Preview
-                  </a>
+                  <ProjectLink href={p.live} icon={ExternalIcon}>
+                    Live Preview
+                  </ProjectLink>
                 )}
                 {p.source && (
-                  <a
-                    className={CARD_LINK}
-                    href={p.source}
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    <GithubIcon /> Source
-                  </a>
+                  <ProjectLink href={p.source} icon={GithubIcon}>
+                    Source
+                  </ProjectLink>
                 )}
               </p>
-            </article>
+            </Card>
           ))}
         </div>
 
@@ -201,9 +168,9 @@ export function ProjectsSection({
             <p className="m-0 font-mono text-[0.64rem] tracking-[0.2em] text-[rgba(247,245,240,0.65)]">
               {Math.min(shown, projects.length)} / {projects.length}
             </p>
-            <button
-              type="button"
-              className="cursor-pointer border border-[rgba(247,245,240,0.45)] bg-transparent px-[1.8rem] py-[0.85rem] font-mono text-[0.72rem] tracking-[0.22em] text-paper transition-[background,color,border-color] duration-300 ease-[ease] hover:border-paper hover:bg-paper hover:text-ink-green"
+            <Button
+              variant="outline"
+              className="h-auto cursor-pointer rounded-none border-[rgba(247,245,240,0.45)] bg-transparent px-[1.8rem] py-[0.85rem] font-mono text-[0.72rem] font-normal tracking-[0.22em] text-paper shadow-none hover:border-paper hover:bg-paper hover:text-ink-green"
               onClick={() =>
                 setShown((n) =>
                   n < projects.length
@@ -213,7 +180,7 @@ export function ProjectsSection({
               }
             >
               {shown < projects.length ? "SHOW MORE" : "SHOW LESS"}
-            </button>
+            </Button>
           </div>
         )}
         {children}

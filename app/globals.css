@@ -1,5 +1,6 @@
 @import "tailwindcss/theme.css" layer(theme);
 @import "tailwindcss/utilities.css" layer(utilities);
+@import "tw-animate-css";
 
 @custom-variant hover (&:hover);
 
@@ -11,6 +12,55 @@
   --color-leaf: #1b4622;
   --color-lava: #f26419;
   --color-ember: #c1300a;
+
+  /* fluid horizontal gutters shared by every section */
+  --spacing-gutter: clamp(1.4rem, 4vw, 3.2rem);
+  --spacing-gutter-lg: clamp(1.4rem, 5vw, 4rem);
+  --text-display: clamp(2.6rem, 7vw, 5.5rem);
+  --text-display--line-height: 0.95;
+}
+
+/* shadcn/ui tokens, mapped onto the paper-cut palette */
+:root {
+  --background: var(--color-paper);
+  --foreground: var(--color-ink);
+  --card: var(--color-ink-green);
+  --card-foreground: var(--color-paper);
+  --primary: var(--color-lava);
+  --primary-foreground: var(--color-ink);
+  --secondary: var(--color-leaf);
+  --secondary-foreground: var(--color-paper);
+  --muted: rgba(247, 245, 240, 0.08);
+  --muted-foreground: rgba(247, 245, 240, 0.6);
+  --accent: var(--color-paper);
+  --accent-foreground: var(--color-ink-green);
+  --destructive: var(--color-ember);
+  --border: rgba(247, 245, 240, 0.16);
+  --input: rgba(247, 245, 240, 0.45);
+  --ring: var(--color-lava);
+  --radius: 0.8rem;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
 }
 
 @theme inline {

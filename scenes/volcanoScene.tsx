@@ -371,14 +371,12 @@ export const volcanoScene: ParallaxLayer[] = [
     ),
   },
 
-  // 1.0 — foreground surf clouds + a near palm
+  // 1.0 — a near palm
   {
     depth: 1,
     sway: 1.2,
     content: (
       <Layer>
-        <Cloud x={120} y={930} scale={1.15} />
-        <Cloud x={1120} y={948} scale={1.3} />
         <Palm x={120} y={1010} scale={0.95} fill="#0C1710" />
       </Layer>
     ),
